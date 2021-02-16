@@ -12,5 +12,6 @@ It is reccommended to use the [Go version](https://github.com/reaitten/OneList/b
 
 
 ### This fork contains translated instructions, and translated "index.html"
+chinese to eng
 #### Please go into the desired version, and read "README.MD" for instructions.
 Will include instructions here in a future date.
