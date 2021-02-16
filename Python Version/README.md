@@ -12,7 +12,7 @@ pip3 install tornado
 
 ## Initialize the configuration file
 ```
-# 运行
+# Run
 python3 OneList.py
 
 # Get the code field content in the browser address bar
@@ -25,17 +25,17 @@ python3 OneList.py
 # config.json
 
 {
-    // OneDrive 中的某个需要列出的目录
-    "RootPath": "/Document",
-    // 网址中的子路径
+    // A directory in OneDrive that needs to be listed
+     "RootPath": "/Document",
+    // Sub path in URL
     "SubPath": "/onedrive",
-    // 目录刷新时间
+    // Catalog refresh time
     "FolderRefresh": 900,
-    // 下载链接刷新时间
+    // Download link refresh time
     "FileRefresh": 1200,
-    // 认证令牌, 将会自动更新, 保持默认
+    // Authentication token, will be automatically updated, keep the default
     "RefreshToken": "",
-    // 这个不用管, 保持默认
+    // Don't worry about this, keep the default
     "RedirectUri": "http://localhost/onedrive-login"
 }
 ```
