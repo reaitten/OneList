@@ -1,144 +1,139 @@
-# OneList - Written in GoLang
-- 支持 国际版, 个人免费版(家庭版), 中国版(世纪互联).
-- 支持同时列出多个盘的目录.(同时挂载多个网盘或单个网盘挂载成多个`SubPath`,要求每个`SubPath`唯一)
-- 支持文件夹内超过 200 个项目
-- 支持后台自动刷新缓存.
-- 支持路径中含有特殊字符.
-- 支持使用不同目录使用不同账户密码加密(HTTP 401).
-- 支持隐藏目录和文件(跳过缓存).
-- 支持自定义 ClientID 和 SecretKey .
-- 数据储存在内存中,响应更加迅速.
+# OneDriveUploader - Written in Go Lang
+- Support International Edition, Personal Edition (Home Edition), China Edition (21Vianet).
+- Support uploading files and folders to the specified directory, and maintain the directory structure before uploading.
+- Support the use of command parameters to facilitate the call of external programs.
+- Support custom upload block size.
+- Support multi-thread upload (multiple files upload at the same time).
+- Supports dynamic adjustment of the number of retries based on file size
+- Support skipping files with the same name that already exist in the network disk.
 
-## 授权
-### 通过下面URL登录 (右键新标签打开)
-#### 国际版, 个人版(家庭版)
+## Authorization
+### Log in through the URL below (right click to open a new tab)
+#### International Edition, Personal Edition (Home Edition)
 [https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=78d4dc35-7e46-42c6-9023-2d39314433a5&response_type=code&redirect_uri=http://localhost/onedrive-login&response_mode=query&scope=offline_access%20User.Read%20Files.ReadWrite.All](https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=78d4dc35-7e46-42c6-9023-2d39314433a5&response_type=code&redirect_uri=http://localhost/onedrive-login&response_mode=query&scope=offline_access%20User.Read%20Files.ReadWrite.All)
-#### 中国版(世纪互联)
+#### China Version (21Vianet)
 [https://login.chinacloudapi.cn/common/oauth2/v2.0/authorize?client_id=dfe36e60-6133-48cf-869f-4d15b8354769&response_type=code&redirect_uri=http://localhost/onedrive-login&response_mode=query&scope=offline_access%20User.Read%20Files.ReadWrite.All](https://login.chinacloudapi.cn/common/oauth2/v2.0/authorize?client_id=dfe36e60-6133-48cf-869f-4d15b8354769&response_type=code&redirect_uri=http://localhost/onedrive-login&response_mode=query&scope=offline_access%20User.Read%20Files.ReadWrite.All)
 
-## 添加配置文件
+### Initialize the configuration file
 ```
-# 国际版
-OneList -a "url" -s "/onedrive01"
-# 个人版(家庭版)
-OneList -ms -a "url" -s "/onedrive02"
-# 中国版(世纪互联)
-OneList -cn -a "url" -s "/onedrive03"
+# International Edition
+OneDriveUploader -a "url"
+# Personal Edition (Home Edition)
+OneDriveUploader -ms -a "url"
+# China Version (21Vianet)
+OneDriveUploader -cn -a "url"
 
-# 在浏览器地址栏中获取以 http://loaclhost 开头的整个url内容
-# 将获取的完整url内容替换命令中的 url 三个字母
-# 每次产生的 url 只能用一次, 重试请重新获取 url
-# 可以一个盘内的多个文件夹分别映射到多个`SubPath`上
-# 此操作将会自动添加的配置文件
-# 提示 Success! Add config. '/path/to/config.json' 则成功
-```
-
-## 修改配置文件
-```
-[
-  {
-    // 如果是家庭版或者个人免费版, 此项应为 true.
-    "MSAccount": false,
-    // 如果是中国版(世纪互联), 此项应为 true.
-    "MainLand": false,
-    // 授权令牌
-    "RefreshToken": "1234564567890ABCDEF",
-    // 单配置文件中,此项要唯一.将此OneDrive中设置为`RootPath`目录映射在`http://127.0.0.1:5288/onedrive` 下.
-    // (只推荐一个盘位的时候使用根目录"/".)
-    "SubPath": "/onedrive",
-    // 读取OneDrive的某个目录作为根目录. (支持根目录"/")
-    "RootPath": "/Test",
-    // 隐藏OneDrive目录中的文件夹和文件, 条目间使用 "|" 分割. (跳过缓存设置的条目.)
-    "HidePath": "/Test/Obj01|/Test/Obj02",
-    // 使用用户名和密码加密OneDrive目录. 目录和用户名密码间使用 "?" 分割, 用户名密码使用 ":" 分割, 条目间使用 "|" 分割. 无效条目将跳过. 
-    "AuthPath": "/Test/Auth01?user01:pwd01|/Test/Auth02?user02:pwd02",
-    // 缓存刷新间隔.(所有项目中的刷新时间取最小值为有效刷新间隔)
-    "RefreshInterval": 900
-  }
-]
+# Get the entire url content starting with http://loaclhost in the browser address bar
+# Replace the obtained full url content with the three letters url in the command
+# Each generated url can only be used once, please try again and get the url again
+# This operation will automatically initialize the configuration file
+# Prompt Init config file: '/path/to/auth.json' to succeed
 ```
 
-## 使用
+## Usage
 ```
-Usage of OneList:
+Usage of OneDriveUploader:
   -a string
-        // 初始化配置文件,添加新配置
+        // Initialize authorization
         Setup and Init auth.json.
-  -bind string
-        // 绑定IP地址(公网: 0.0.0.0)
-        Bind Address (default "127.0.0.1")
-  -port string
-        // 绑定端口(HTTP:80)
-        Port (default "5288")
-  -s string
-        // 设置 SubPath 项, 需要与 -a 一起使用.
-        Set SubPath. [unique per account] (default "/")
+  -b string
+        // Custom upload block size can improve network throughput, which is limited by disk performance and network speed.
+        Set block size. [Unit: M; 5<=b<=60;] (default "10")
   -c string
-        // 配置文件
-        Config file. (default "config.json")
+        // Configuration file path
+        Config file. (default "auth.json")
+  -n string
+        // When uploading a single file, rename it in the network disk
+        Rename file on upload to remote.
+  -r string
+        // Upload to a directory in the network disk, default: root directory
+        Upload to reomte path.
+  -s string
+        // *Required parameters, file or folder to upload
+        Upload item.
   -t string
-        // Index.html 目录样式文件
-        Index file. (default "index.html")
-  -json
-        // 开关
-        // 数据以 json 形式输出当前目录数据
-        Output json.
+        // Number of threads, number of files uploaded at the same time. Default: 2
+        Set thread num. (default "2")
+  -f
+        // switch (recommended)
+        // Add the -f parameter to force reading the block size configuration and multi-thread configuration in auth.json.
+        // Without the -f parameter, every time the current parameters are overwritten and saved to the auth.json configuration file.
+        Force Read config form config file. [BlockSize, ThreadNum]
+  -skip
+        // switch
+        // Skip uploading the file with the same name that already exists in the network disk. (The default is not skipped)
+        Skip exist file on remote.
   -cn
-        // 开关
-        // 授权中国版(世纪互联), 需要此参数.
+        // switch
+        // Authorize the Chinese version (21Vianet), this parameter is required.
         OneDrive by 21Vianet.
   -ms
-        // 开关
-        // 授权个人版(家庭版), 需要此参数.
+        // switch
+        // Authorized personal edition (home edition), this parameter is required.
         OneDrive by Microsoft.
-  -C string
-        // 覆写所有预置的 Client ID. (不建议新手使用此参数)
-        Set  Client ID. [Overwrite all clientId]
-  -S string
-        // 覆写所有预置的 Secret Key. (不建议新手使用此参数)
-        Set Secret Key. [Overwrite all secretKey]
-  -P string
-        // 设置反代域名.此设置将全部流量定向到某个服务器或CDN,用于隐藏全局域名或者加速.
-        // 每组以";"相间隔. 源域名与目标域名以"|"间隔. 可以设置多组.
-        // 默认为空,使用时不要带中括号. (不建议新手使用此参数)
-        Set Proxy Domain. ["x.sharepoint.com|domain.com;x.sharepoint.cn|domain.cn;..."]
 ```
 
-## 运行
+## Configuration
 ```
-# 保证 config.json 和 index.html 同目录, 直接运行.
-$ OneList
-# 监听公网 80 端口
-$ OneList -bind 0.0.0.0 -port 80
+{
+     // authorization token
+     "RefreshToken": "1234564567890ABCDEF",
+     // Maximum number of threads. (Number of files uploaded at the same time)
+     "ThreadNum": "2",
+     // Maximum upload block size. (The maximum block size of each uploaded file. It is recommended to lower it if the network is not good. Unit: MB)
+     "BlockSize": "10",
+     // Maximum single file size. (Currently: the single file limit for the personal version (home version) is 100GB; the single file limit for other versions is 15GB, and Microsoft will gradually update it to 100GB. Unit: GB)
+     "SigleFile": "100",
+     // Cache refresh interval.
+     "RefreshInterval": 1500,
+     // If it is the Chinese version (21Vianet), this item should be true.
+     "MainLand": false,
+     // If it is a home version or a personal free version, this item should be true.
+     "MSAccount": true
+}
 ```
 
-## 注意
-- 在初次缓存过程中或者打开空文件夹, 会提示 No Found.
-- 请使用 UTF-8 编码模式手动编辑 config.json 文件.
-
-## Nginx 反代配置
+## Example
 ```
-    location ^~ /onedrive/ {
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_pass http://127.0.0.1:5288;
-    }
-```
+# Some examples:
+# Upload the mm00.jpg file in the same directory to the root directory of the OneDrive network disk
 
-## 后台运行及开机自启
-```
-# /path/to/OneList 为OneList的完整路径
-# 后台运行
-nohup /path/to/OneList -bind 0.0.0.0 -port 80 >/dev/null 2>&1 &
+OneDriveUploader -s "mm00.jpg"
 
-# 开机自启并后台运行
-编辑 /etc/crontab 文件, 并添加下面一行并多按几个回车. (有些系统不留空行会出现意外)
-@reboot root nohup /path/to/OneList -bind 0.0.0.0 -port 80 >/dev/null 2>&1 &
+# Upload the mm00.jpg file in the same directory to the root directory of the OneDrive network disk and rename it to mm01.jpg
 
+OneDriveUploader -s "mm00.jpg" -n "mm01.jpg"
+
+# Upload the Download folder in the same directory to the root directory of the OneDrive network disk
+
+OneDriveUploader -s "Download"
+
+# Upload the Download folder in the same directory to the Test directory of the OneDrive network disk
+
+OneDriveUploader -s "Download" -r "Test"
+
+# Upload the Download folder in the same directory to the Test directory of the OneDrive network disk, using 10 threads
+
+OneDriveUploader -t 10 -s "Download" -r "Test"
+
+# Upload the Download folder in the same directory to the Test directory of the OneDrive network disk, use 15 threads, and set the block size to 20M
+
+OneDriveUploader -t 15 -b 20 -s "Download" -r "Test"
+
+# Upload the Download folder in the same directory to the Test directory of the OneDrive network disk, and use the thread parameters and block size parameters in the configuration file
+
+OneDriveUploader -f -c "/urs/local/auth.json" -s "Download" -r "Test"
+
+# Upload the Download folder in the same directory to the Test directory of the OneDrive network disk, use the thread parameter and block size parameter in the configuration file, and skip uploading the file with the same name that already exists in the network disk
+
+OneDriveUploader -f -c "/urs/local/auth.json" -skip -s "Download" -r "Test"
 ```
+## Note
+-After multiple attempts, no failed upload files. The exit code is 0.
+-In the end, the failed upload files will be listed in detail. The exit code is 1.
 
 ## Client/Secret (~ 2299/12/31)
 ```
-# 国际版: 78d4dc35-7e46-42c6-9023-2d39314433a5| ZudGl-p.m=LMmr3VrKgAyOf-WevB3p50
-# 中国版: dfe36e60-6133-48cf-869f-4d15b8354769| H0-1:6.Sb8:WCW/J-c]K@fddCt[i0EZ2
-# ReplyURL: http://localhost/onedrive-login
+# International Edition: 78d4dc35-7e46-42c6-9023-2d39314433a5| ZudGl-p.m=LMmr3VrKgAyOf-WevB3p50
+# Chinese version: dfe36e60-6133-48cf-869f-4d15b8354769| H0-1:6.Sb8:WCW/J-c]K@fddCt[i0EZ2
 ```
