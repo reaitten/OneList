@@ -8,7 +8,7 @@ A simple Index for OneDrive
 ## OneList written in [Python](https://github.com/reaitten/OneList/blob/master/Python%20Version/README.md)
 ## OneList written in [Go](https://github.com/reaitten/OneList/blob/master/Go%20Version/README.MD)
 
-It is reccommended to use the [Go version](https://github.com/reaitten/OneList/blob/master/Go%20Version/README.MD) since the [Python version](https://github.com/reaitten/OneList/blob/master/Python%20Version/README.md) has many bugs and incomplete functions.
+It is reccommended to use the [Go version](https://github.com/reaitten/OneList/blob/master/Go%20Version/README.MD) since of the [Python version](https://github.com/reaitten/OneList/blob/master/Python%20Version/README.md) has many bugs and incomplete functions.
 
 
 ### This fork contains translated instructions, and translated "index.html"
